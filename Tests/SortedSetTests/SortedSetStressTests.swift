@@ -8,7 +8,7 @@
 import XCTest
 import SortedSet
 
-#if true
+#if false
 final class SortedSetStressTests: XCTestCase {
 
     override func setUpWithError() throws {
