@@ -5,6 +5,7 @@
 //  Created by narumij on 2024/09/16.
 //
 
+#if DEBUG
 import XCTest
 @testable import SortedSet
 
@@ -20,33 +21,22 @@ final class SortedSetTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testRange() throws {
+    func testInitEmtpy() throws {
+        let set = SortedSet<Int>()
+        XCTAssertEqual(set.buckets.flatMap{$0}, [])
+    }
+
+    func testInitRange() throws {
         let set = SortedSet<Int>(0 ..< 10000)
         XCTAssertEqual(set.buckets.flatMap{$0}, (0 ..< 10000) + [])
     }
     
-    func testEmtpy() throws {
-        let set = SortedSet<Int>()
-        XCTAssertEqual(set.buckets.flatMap{$0}, [])
+    func testInitCollection() throws {
+        let set = SortedSet<Int>(0 ..< 10000)
+        XCTAssertEqual(set.buckets.flatMap{$0}, (0 ..< 10000) + [])
     }
     
-//    func testExample1() throws {
-//        var set = SortedSet<Int>(a: 0 ..< 1200)
-//        XCTAssertEqual(set.a.count, 9)
-//        XCTAssertEqual(set.index(1101), 1101)
-//        XCTAssertEqual(set.pop(1100),1100)
-//        XCTAssertEqual(set.a.count, 9)
-//        XCTAssertEqual(set.index(1101), 1100)
-//        XCTAssertEqual(set.pop(1100),1101)
-//        XCTAssertEqual(set.a.count, 9)
-//        XCTAssertEqual(set.index(1102), 1100)
-//    }
-    
-    func testPosition() throws {
-        
-    }
-    
-    func testExample1() throws {
+    func testRemove() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.remove(0), true)
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
@@ -71,54 +61,54 @@ final class SortedSetTests: XCTestCase {
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
     }
     
-    func testExample11() throws {
+    func testRemoveAt() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
-        XCTAssertEqual(set.pop(0), 0)
+        XCTAssertEqual(set.remove(at: 0), 0)
         XCTAssertEqual(set.buckets.flatMap{$0}, [1,2,3,4])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(0), 1)
+        XCTAssertEqual(set.remove(at: 0), 1)
         XCTAssertEqual(set.buckets.flatMap{$0}, [2,3,4])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(0), 2)
+        XCTAssertEqual(set.remove(at: 0), 2)
         XCTAssertEqual(set.buckets.flatMap{$0}, [3,4])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(0), 3)
+        XCTAssertEqual(set.remove(at: 0), 3)
         XCTAssertEqual(set.buckets.flatMap{$0}, [4])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(0), 4)
+        XCTAssertEqual(set.remove(at: 0), 4)
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(0), nil)
+        XCTAssertEqual(set.remove(at: 0), nil)
     }
 
-    func testExample12() throws {
+    func testRemoveReverse_1() throws {
         var set = SortedSet<Int>([0])
-        XCTAssertEqual(set.pop(-1), 0)
+        XCTAssertEqual(set.remove(at: -1), 0)
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
     }
 
-    func testExample13() throws {
+    func testRemoveReverse_2() throws {
         
         var set = SortedSet<Int>([0,1,2,3,4])
-        XCTAssertEqual(set.pop(-1), 4)
+        XCTAssertEqual(set.remove(at: -1), 4)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0,1,2,3])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(-1), 3)
+        XCTAssertEqual(set.remove(at: -1), 3)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0,1,2])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(-1), 2)
+        XCTAssertEqual(set.remove(at: -1), 2)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0,1])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(-1), 1)
+        XCTAssertEqual(set.remove(at: -1), 1)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(-1), 0)
+        XCTAssertEqual(set.remove(at: -1), 0)
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
-        XCTAssertEqual(set.pop(-1), nil)
+        XCTAssertEqual(set.remove(at: -1), nil)
     }
 
-    func testExample2() throws {
+    func testInsert() throws {
         var set = SortedSet<Int>([])
         XCTAssertEqual(set.insert(0), true)
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
@@ -143,7 +133,7 @@ final class SortedSetTests: XCTestCase {
         XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
     }
     
-    func testExample3() throws {
+    func test_LT_GT() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.count, 5)
         XCTAssertEqual(set.lt(-1), nil)
@@ -220,7 +210,7 @@ final class SortedSetTests: XCTestCase {
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
     }
     
-    func testExample4() throws {
+    func testContains() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.count, 5)
         XCTAssertEqual(set.contains(-1), false)
@@ -269,7 +259,7 @@ final class SortedSetTests: XCTestCase {
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
     }
     
-    func testExample5() throws {
+    func test_LE_GE() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.count, 5)
         XCTAssertEqual(set.le(-1), nil)
@@ -346,7 +336,7 @@ final class SortedSetTests: XCTestCase {
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
     }
 
-    func testExample6() throws {
+    func testLeftRight() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.count, 5)
         XCTAssertEqual(set.left(-1), 0)
@@ -431,7 +421,7 @@ final class SortedSetTests: XCTestCase {
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
     }
     
-    func testExample7() throws {
+    func testArrayAccess() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set[0], 0)
         XCTAssertEqual(set[1], 1)
@@ -445,39 +435,5 @@ final class SortedSetTests: XCTestCase {
         XCTAssertEqual(set[-4], 1)
         XCTAssertEqual(set[-5], 0)
     }
-    
-    func testExample8() throws {
-        var set = SortedSet<Int>(0..<1000)
-        XCTAssertEqual(set.map{ $0 }, (0..<1000) + [])
-    }
-
-
-    func testPerformanceExample0() throws {
-        throw XCTSkip()
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-            var set = SortedSet<Int>((0 ..< 1_000_000) + [])
-        }
-    }
-    
-    func testPerformanceExample1() throws {
-        throw XCTSkip()
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-            var set = SortedSet<Int>(0 ..< 1_000_000)
-        }
-    }
-
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-//            var set = SortedSet<Int>(a: 0 ..< 5_000_000)
-//            XCTAssertEqual(set.pop(999),999)
-        }
-    }
-
 }
+#endif

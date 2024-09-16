@@ -39,15 +39,15 @@ public struct SortedSet<Element: Comparable> {
         count = n
     }
 
-    init() {
+    public init() {
         self.init(uniqued: [])
     }
 
-    init(_ range: Range<Element>) where Element: FixedWidthInteger {
+    public init(_ range: Range<Element>) where Element: FixedWidthInteger {
         self.init(uniqued: range + [])
     }
 
-    init<S>(_ _a: S) where S: Collection, S.Element == Element {
+    public init<S>(_ _a: S) where S: Collection, S.Element == Element {
         var a = _a + []
         if (0..<Swift.max(0,a.count - 1)).contains(where: { a[$0] > a[$0 + 1] }) {
             a.sort()
@@ -294,7 +294,7 @@ extension SortedSet {
     //                if i < len(a): return self._pop(a, b, i)
     //                i -= len(a)
     //        raise IndexError
-    public mutating func pop(_ index: Index) -> Element? {
+    public mutating func remove(at index: Index) -> Element? {
         var i = index
         if i < 0 {
             for (b,bucket) in buckets.enumerated().reversed() {
