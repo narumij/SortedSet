@@ -1,11 +1,14 @@
 import Foundation
 
+//class SortedSet(Generic[T]):
+
 enum SortedSetCondition {
+//    BUCKET_RATIO = 16
+//    SPLIT_RATIO = 24
     static var BUCKET_RATIO: Double = 16
     static var SPLIT_RATIO: Int = 24
 }
 
-//class SortedSet(Generic[T]):
 public struct SortedSet<Element: Comparable> {
     let BUCKET_RATIO: Double = SortedSetCondition.BUCKET_RATIO
     let SPLIT_RATIO: Int = SortedSetCondition.SPLIT_RATIO
@@ -117,12 +120,18 @@ extension SortedSet {
     //            if x <= a[-1]: break
     //        return (a, i, bisect_left(a, x))
     private func _position(_ x: Element) -> (ArraySlice<Element>, BucketIndex, Index) {
-        var bucketIndex = 0
-        for (b, bucket) in buckets.enumerated() {
-            bucketIndex = b
-            if let l = bucket.last, x <= l {
-                break
+        var (left, right) = (buckets.startIndex, buckets.endIndex)
+        while left < right {
+            let mid = (left + right) >> 1
+            if let l = buckets[mid].last, l < x {
+                left = mid + 1
+            } else {
+                right = mid
             }
+        }
+        var bucketIndex = left
+        if bucketIndex == buckets.endIndex {
+            bucketIndex -= 1
         }
         return (buckets[bucketIndex], bucketIndex, buckets[bucketIndex].left(x))
     }
@@ -161,7 +170,10 @@ extension SortedSet {
         count += 1
         if buckets[bi].count > buckets.count * SPLIT_RATIO {
             let mid = buckets[bi].count >> 1
-            buckets[bi ..< bi+1] = [ buckets[bi][..<mid], buckets[bi][mid...] ]
+            if mid != buckets[bi].startIndex {
+                buckets[bi ..< bi + 1] = [ buckets[bi][..<mid], buckets[bi][mid...] ]
+                buckets = buckets.map{ ArraySlice($0) }
+            }
         }
         return true
     }

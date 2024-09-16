@@ -20,12 +20,12 @@ final class SortedSetTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample0() throws {
-        var set = SortedSet<Int>(0 ..< 10000)
-        XCTAssertEqual(set.pop(999),999)
+    func testRange() throws {
+        let set = SortedSet<Int>(0 ..< 10000)
+        XCTAssertEqual(set.buckets.flatMap{$0}, (0 ..< 10000) + [])
     }
     
-    func testExample01() throws {
+    func testEmtpy() throws {
         let set = SortedSet<Int>()
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
     }
@@ -42,33 +42,52 @@ final class SortedSetTests: XCTestCase {
 //        XCTAssertEqual(set.index(1102), 1100)
 //    }
     
+    func testPosition() throws {
+        
+    }
+    
     func testExample1() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.remove(0), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(1), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(2), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(3), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(4), true)
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(0), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(1), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(2), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(3), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.remove(4), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
     }
     
     func testExample11() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.pop(0), 0)
         XCTAssertEqual(set.buckets.flatMap{$0}, [1,2,3,4])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(0), 1)
         XCTAssertEqual(set.buckets.flatMap{$0}, [2,3,4])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(0), 2)
         XCTAssertEqual(set.buckets.flatMap{$0}, [3,4])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(0), 3)
         XCTAssertEqual(set.buckets.flatMap{$0}, [4])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(0), 4)
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(0), nil)
     }
 
@@ -83,30 +102,45 @@ final class SortedSetTests: XCTestCase {
         var set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set.pop(-1), 4)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0,1,2,3])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(-1), 3)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0,1,2])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(-1), 2)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0,1])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(-1), 1)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(-1), 0)
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.pop(-1), nil)
     }
 
     func testExample2() throws {
         var set = SortedSet<Int>([])
         XCTAssertEqual(set.insert(0), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(1), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(2), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(3), true)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(4), true)
         XCTAssertEqual(set.buckets.flatMap{$0}, [0,1,2,3,4])
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(0), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(1), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(2), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(3), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
         XCTAssertEqual(set.insert(4), false)
+        XCTAssertFalse(set.buckets.contains{ $0.isEmpty })
     }
     
     func testExample3() throws {
