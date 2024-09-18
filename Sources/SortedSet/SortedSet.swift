@@ -14,14 +14,20 @@ enum SortedSetCondition {
 }
 
 public struct SortedSet<Element: Comparable> {
+    @usableFromInline
     let BUCKET_RATIO: Double = SortedSetCondition.BUCKET_RATIO
+    @usableFromInline
     let SPLIT_RATIO: Int = SortedSetCondition.SPLIT_RATIO
     
     public typealias Index = ArraySlice<Element>.Index
+    @usableFromInline
     typealias BucketIndex = Array<ArraySlice<Element>>.Index
+    @usableFromInline
     var buckets: Array<ArraySlice<Element>>
-    public private(set) var count: Int
-    var isEmpty: Bool { count == 0 }
+    @usableFromInline
+    var _count: Int
+    public var count: Int { _count }
+    var isEmpty: Bool { _count == 0 }
     //    def __init__(self, a: Iterable[T] = []) -> None:
     //        "Make a new SortedSet from iterable. / O(N) if sorted and unique / O(N log N)"
     //        a = list(a)
@@ -36,33 +42,37 @@ public struct SortedSet<Element: Comparable> {
     //        n = self.size = len(a)
     //        num_bucket = int(math.ceil(math.sqrt(n / self.BUCKET_RATIO)))
     //        self.a = [a[n * i // num_bucket : n * (i + 1) // num_bucket] for i in range(num_bucket)]
-    private init(uniqued a: [Element]) {
+    @inlinable
+    init(uniqued a: [Element]) {
         let n = a.count
         let num_bucket: Int = Int(ceil(sqrt(Double(n) / BUCKET_RATIO)))
         buckets = (0..<num_bucket).map{ i in a[n * i / num_bucket ..< n * (i + 1) / num_bucket] }
-        count = n
+        _count = n
     }
 
     public init() {
         self.init(uniqued: [])
     }
 
+    @inlinable
     public init(_ range: Range<Element>) where Element: FixedWidthInteger {
         self.init(uniqued: range + [])
     }
 
+    @inlinable
     public init<S>(_ _a: S) where S: Collection, S.Element == Element {
         var a = _a + []
         if (0..<Swift.max(0,a.count - 1)).contains(where: { a[$0] > a[$0 + 1] }) {
             a.sort()
         }
         if (0..<Swift.max(0,a.count - 1)).contains(where: { a[$0] >= a[$0 + 1] }) {
-            var (a,b): ([Element],[Element]) = ([],a)
+            var (c,b): ([Element],[Element]) = ([],a)
             for x in b {
-                if a.isEmpty || a.last != x {
-                    a.append(x)
+                if c.isEmpty || c.last != x {
+                    c.append(x)
                 }
             }
+            a = c
         }
         self.init(uniqued: a)
     }
@@ -123,7 +133,8 @@ extension SortedSet {
     //        for i, a in enumerate(self.a):
     //            if x <= a[-1]: break
     //        return (a, i, bisect_left(a, x))
-    private func _position(_ x: Element) -> (ArraySlice<Element>, BucketIndex, Index) {
+    @inlinable
+    func _position(_ x: Element) -> (ArraySlice<Element>, BucketIndex, Index) {
         var (left, right) = (buckets.startIndex, buckets.endIndex)
         while left < right {
             let mid = (left + right) >> 1
@@ -143,8 +154,9 @@ extension SortedSet {
     //        if self.size == 0: return False
     //        a, _, i = self._position(x)
     //        return i != len(a) and a[i] == x
+    @inlinable
     public func contains(_ x: Element) -> Bool {
-        if count == 0 { return false }
+        if _count == 0 { return false }
         let (bucket,_,i) = _position(x)
         return i < bucket.endIndex && bucket[i] == x
     }
@@ -162,16 +174,17 @@ extension SortedSet {
     //            mid = len(a) >> 1
     //            self.a[b:b+1] = [a[:mid], a[mid:]]
     //        return True
+    @inlinable
     public mutating func insert(_ x: Element) -> Bool {
-        if count == 0 {
+        if _count == 0 {
             buckets = [[x]]
-            count = 1
+            _count = 1
             return true
         }
         let (b,bi,i) = _position(x)
         if i < b.endIndex, b[i] == x { return false }
         buckets[bi].insert(x, at: i)
-        count += 1
+        _count += 1
         if buckets[bi].count > buckets.count * SPLIT_RATIO {
             let mid = buckets[bi].count >> 1
             if mid != buckets[bi].startIndex {
@@ -186,9 +199,10 @@ extension SortedSet {
     //        self.size -= 1
     //        if not a: del self.a[b]
     //        return ans
-    private mutating func _pop(bucketIndex: BucketIndex, index: Index) -> Element {
+    @inlinable
+    mutating func _pop(bucketIndex: BucketIndex, index: Index) -> Element {
         let ans = buckets[bucketIndex].remove(at: index)
-        count -= 1
+        _count -= 1
         if buckets[bucketIndex].isEmpty {
             buckets.remove(at: bucketIndex)
         }
@@ -201,8 +215,9 @@ extension SortedSet {
     //        if i == len(a) or a[i] != x: return False
     //        self._pop(a, b, i)
     //        return True
+    @inlinable
     public mutating func remove(_ x: Element) -> Bool {
-        if count == 0 { return false }
+        if _count == 0 { return false }
         let (b, bi, i) = _position(x)
         if i == b.endIndex || b[i] != x { return false }
         _ = _pop(bucketIndex: bi, index: i)
@@ -213,6 +228,7 @@ extension SortedSet {
     //        for a in reversed(self.a):
     //            if a[0] < x:
     //                return a[bisect_left(a, x) - 1]
+    @inlinable
     public func lt(_ x: Element) -> Element? {
         for bucket in buckets.reversed() {
             if bucket[bucket.startIndex] < x { return bucket[bucket.left(x) - 1] }
@@ -224,6 +240,7 @@ extension SortedSet {
     //        for a in reversed(self.a):
     //            if a[0] <= x:
     //                return a[bisect_right(a, x) - 1]
+    @inlinable
     public func le(_ x: Element) -> Element? {
         for bucket in buckets.reversed() {
             if bucket[bucket.startIndex] <= x { return bucket[bucket.right(x) - 1] }
@@ -235,6 +252,7 @@ extension SortedSet {
     //        for a in self.a:
     //            if a[-1] > x:
     //                return a[bisect_right(a, x)]
+    @inlinable
     public func gt(_ x: Element) -> Element? {
         for bucket in buckets {
             if let l = bucket.last, l > x {
@@ -248,6 +266,7 @@ extension SortedSet {
     //        for a in self.a:
     //            if a[-1] >= x:
     //                return a[bisect_left(a, x)]
+    @inlinable
     public func ge(_ x: Element) -> Element? {
         for bucket in buckets {
             if let l = bucket.last, l >= x {
@@ -267,6 +286,7 @@ extension SortedSet {
     //                if i < len(a): return a[i]
     //                i -= len(a)
     //        raise IndexError
+    @inlinable
     public subscript(index: Index) -> Element {
         var i = index
         if i < 0 {
@@ -298,6 +318,7 @@ extension SortedSet {
     //                if i < len(a): return self._pop(a, b, i)
     //                i -= len(a)
     //        raise IndexError
+    @inlinable
     public mutating func remove(at index: Index) -> Element? {
         var i = index
         if i < 0 {
@@ -326,6 +347,7 @@ extension SortedSet {
     //                return ans + bisect_left(a, x)
     //            ans += len(a)
     //        return ans
+    @inlinable
     public func left(_ x: Element) -> Index {
         var ans = 0
         for bucket in buckets {
@@ -344,6 +366,7 @@ extension SortedSet {
     //                return ans + bisect_right(a, x)
     //            ans += len(a)
     //        return ans
+    @inlinable
     public func right(_ x: Element) -> Index {
         var ans = 0
         for bucket in buckets {

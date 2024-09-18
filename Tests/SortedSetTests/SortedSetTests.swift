@@ -24,16 +24,29 @@ final class SortedSetTests: XCTestCase {
     func testInitEmtpy() throws {
         let set = SortedSet<Int>()
         XCTAssertEqual(set.buckets.flatMap{$0}, [])
+        XCTAssertEqual(set.count, 0)
+        XCTAssertTrue(set.isEmpty)
     }
 
     func testInitRange() throws {
         let set = SortedSet<Int>(0 ..< 10000)
         XCTAssertEqual(set.buckets.flatMap{$0}, (0 ..< 10000) + [])
+        XCTAssertEqual(set.count, 10000)
+        XCTAssertFalse(set.isEmpty)
     }
     
-    func testInitCollection() throws {
+    func testInitCollection1() throws {
         let set = SortedSet<Int>(0 ..< 10000)
         XCTAssertEqual(set.buckets.flatMap{$0}, (0 ..< 10000) + [])
+        XCTAssertEqual(set.count, 10000)
+        XCTAssertFalse(set.isEmpty)
+    }
+    
+    func testInitCollection2() throws {
+        let set = SortedSet<Int>([2,3,3,0,0,1,1,1])
+        XCTAssertEqual(set.buckets.flatMap{$0}, [0,1,2,3])
+        XCTAssertEqual(set.count, 4)
+        XCTAssertFalse(set.isEmpty)
     }
     
     func testRemove() throws {
@@ -135,7 +148,7 @@ final class SortedSetTests: XCTestCase {
     
     func test_LT_GT() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
-        XCTAssertEqual(set.count, 5)
+        XCTAssertEqual(set._count, 5)
         XCTAssertEqual(set.lt(-1), nil)
         XCTAssertEqual(set.gt(-1), 0)
         XCTAssertEqual(set.lt(0), nil)
@@ -212,7 +225,7 @@ final class SortedSetTests: XCTestCase {
     
     func testContains() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
-        XCTAssertEqual(set.count, 5)
+        XCTAssertEqual(set._count, 5)
         XCTAssertEqual(set.contains(-1), false)
         XCTAssertEqual(set.contains(0), true)
         XCTAssertEqual(set.contains(1), true)
@@ -261,7 +274,7 @@ final class SortedSetTests: XCTestCase {
     
     func test_LE_GE() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
-        XCTAssertEqual(set.count, 5)
+        XCTAssertEqual(set._count, 5)
         XCTAssertEqual(set.le(-1), nil)
         XCTAssertEqual(set.ge(-1), 0)
         XCTAssertEqual(set.le(0), 0)
@@ -338,7 +351,7 @@ final class SortedSetTests: XCTestCase {
 
     func testLeftRight() throws {
         var set = SortedSet<Int>([0,1,2,3,4])
-        XCTAssertEqual(set.count, 5)
+        XCTAssertEqual(set._count, 5)
         XCTAssertEqual(set.left(-1), 0)
         XCTAssertEqual(set.buckets.flatMap{$0}.count{ $0 < -1 }, 0)
         XCTAssertEqual(set.left(0), 0)
@@ -422,7 +435,7 @@ final class SortedSetTests: XCTestCase {
     }
     
     func testArrayAccess() throws {
-        var set = SortedSet<Int>([0,1,2,3,4])
+        let set = SortedSet<Int>([0,1,2,3,4])
         XCTAssertEqual(set[0], 0)
         XCTAssertEqual(set[1], 1)
         XCTAssertEqual(set[2], 2)
