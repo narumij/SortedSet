@@ -2,7 +2,7 @@ import Foundation
 
 // Original: https://qiita.com/tatyam/items/492c70ac4c955c055602
 // Original Github: https://github.com/tatyam-prime/SortedSet
-// ライセンス無し
+// Unlicense
 
 //class SortedSet(Generic[T]):
 
