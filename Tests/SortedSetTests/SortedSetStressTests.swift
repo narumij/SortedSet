@@ -55,9 +55,8 @@ final class SortedSetStressTests: XCTestCase {
     func testPerformanceExample2() throws {
         try skip()
         // This is an example of a performance test case.
-        var set = SortedSet<Int>()
-
         self.measure {
+          var set = SortedSet<Int>()
             // Put the code you want to measure the time of here.
             for i in 0 ..< count {
                 _ = set.insert(i)
